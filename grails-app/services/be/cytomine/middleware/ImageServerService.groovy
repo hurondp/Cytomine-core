@@ -63,6 +63,16 @@ class ImageServerService extends ModelService {
     }
 
     def storageSpace(ImageServer is) {
+        log.info("storageSpace")
+        log.info(is)
+        log.info(is.internalUrl)
+        log.info(makeGetUrl("/storage/size.json", is.internalUrl, [:]))
+        def get = new URL(makeGetUrl("/storage/size.json", is.internalUrl, [:])).openConnection();
+        def getRC = get.getResponseCode();
+        log.info(getRC);
+        if (getRC.equals(200)) {
+            log.info(get.getInputStream().getText());
+        }
         return JSON.parse(new URL(makeGetUrl("/storage/size.json", is.internalUrl, [:])).text)
     }
 
