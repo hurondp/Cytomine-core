@@ -18,18 +18,17 @@ FROM cytomine/tomcat7:v1.2.1
 
 MAINTAINER Cytomine SCRLFS "support@cytomine.coop"
 
-ARG CORE_URL
-ENV CORE_URL=$CORE_URL
+ADD ci/cytomine.war /tmp/cytomine.war
 
-RUN rm -r /var/lib/tomcat7/webapps/* && cd /var/lib/tomcat7/webapps/  && wget $CORE_URL -O ROOT.war
+RUN rm -r /var/lib/tomcat7/webapps/* &&  mv /tmp/cytomine.war /var/lib/tomcat7/webapps/ROOT.war
 RUN cd /var/lib/tomcat7/  && wget https://github.com/cytomine/Cytomine-core/releases/download/v3.0.4/restapidoc.json -O restapidoc.json
 
 RUN mkdir -p /usr/share/tomcat7/.grails
 
 RUN touch /tmp/addHosts.sh
-ADD setenv.sh /tmp/setenv.sh
+ADD scriptsCI/docker/core/setenv.sh /tmp/setenv.sh
 RUN chmod +x /tmp/setenv.sh
-ADD deploy.sh /tmp/deploy.sh
+ADD scriptsCI/docker/core/deploy.sh /tmp/deploy.sh
 RUN chmod +x /tmp/deploy.sh
 
 ENTRYPOINT ["/tmp/deploy.sh"]
