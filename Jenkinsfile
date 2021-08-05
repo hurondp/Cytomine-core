@@ -43,33 +43,33 @@ node {
         echo("Private: ${env.PRIVATE}")
 
         if (env.PRIVATE && env.PRIVATE.equals("true")) {
-            stage 'Publish war'
+            stage 'Publish war (private)'
             sh 'scriptsCI/ciPublishWarPrivate.sh'
 
-            stage 'Build docker image'
+            stage 'Build docker image (private)'
             withCredentials(
                 [
-                    usernamePassword(credentialsId: 'DOCKERHUB_CREDENTIAL', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_TOKEN')
+                    usernamePassword(credentialsId: 'CYTOMINE_DOCKER_REGISTRY', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_TOKEN')
                 ]
                 ) {
-                    docker.withRegistry('https://index.docker.io/v1/', 'DOCKERHUB_CREDENTIAL') {
-                        sh 'scriptsCI/ciBuildDockerImage.sh'
+                    docker.withRegistry('http://repository.cytom.in:5004/v2/', 'CYTOMINE_DOCKER_REGISTRY') {
+                        sh 'scriptsCI/ciBuildDockerImagePrivate.sh'
                     }
                 }
         } else {
-            stage 'Publish war'
-            sh 'scriptsCI/ciPublishWar.sh'
-
-            stage 'Build docker image'
-            withCredentials(
-                [
-                    usernamePassword(credentialsId: 'DOCKERHUB_CREDENTIAL', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_TOKEN')
-                ]
-                ) {
-                    docker.withRegistry('https://index.docker.io/v1/', 'DOCKERHUB_CREDENTIAL') {
-                        sh 'scriptsCI/ciBuildDockerImage.sh'
-                    }
-                }
+//             stage 'Publish war'
+//             sh 'scriptsCI/ciPublishWar.sh'
+//
+//             stage 'Build docker image'
+//             withCredentials(
+//                 [
+//                     usernamePassword(credentialsId: 'DOCKERHUB_CREDENTIAL', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_TOKEN')
+//                 ]
+//                 ) {
+//                     docker.withRegistry('https://index.docker.io/v1/', 'DOCKERHUB_CREDENTIAL') {
+//                         sh 'scriptsCI/ciBuildDockerImage.sh'
+//                     }
+//                 }
         }
     }
 }
