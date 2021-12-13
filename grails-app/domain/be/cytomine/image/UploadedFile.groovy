@@ -38,7 +38,7 @@ import java.nio.file.Paths
  */
 @RestApiObject(name = "Uploaded file", description = "A file uploaded on the server")
 class UploadedFile extends CytomineDomain implements Serializable {
-
+    static List<String> extensionsSupportedByPims = ["isyntax"]
     enum Status {
         /**
          * Even codes lower than 100 => information
@@ -188,7 +188,15 @@ class UploadedFile extends CytomineDomain implements Serializable {
     def getPath() {
         if (contentType == "virtual/stack")
             return null;
+
+        if (isProcessedByPims()) {
+            return Paths.get(filename).toString()
+        }
         return Paths.get(imageServer?.basePath, user.id as String, filename).toString()
+    }
+
+    private boolean isProcessedByPims() {
+        return filename && filename.split("\\.").length > 0  && extensionsSupportedByPims.contains(filename.split("\\.")[-1].toLowerCase())
     }
 
     def beforeInsert() {
