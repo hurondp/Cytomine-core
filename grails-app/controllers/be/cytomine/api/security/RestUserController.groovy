@@ -87,7 +87,12 @@ class RestUserController extends RestController {
     def showRepresentativeByProject() {
         Project project = projectService.read(params.long('id'))
         if (project) {
-            responseSuccess(projectRepresentativeUserService.listUserByProject(project))
+            def users = projectRepresentativeUserService.listUserByProject(project)
+            users = users.collect{User.getDataFromDomain(it)}
+            users.each {
+                it.doNotHideEmail = true
+            }
+            responseSuccess(users)
         } else {
             responseNotFound("User", "Project", params.id)
         }
@@ -919,8 +924,8 @@ class RestUserController extends RestController {
 
     @Override
     protected void filterOneElement(JSONObject element){
-        if(element['id'] != cytomineService.currentUser.id)
-        element['email'] = null
+        if(element['id'] != cytomineService.currentUser.id && !element.doNotHideEmail)
+            element['email'] = null
     }
 
 }
